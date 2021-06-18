@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验系统入口</title>
+    {% load staticfiles %}
+    <link REL="SHORTCUT ICON" HREF="{% static " /favicon.ico" %}" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+    <!-- <link rel="stylesheet" href="/static/font-awesome.css"> -->
+    <script src="/static/chart.min.js"></script>
+    <script src="/static/d3.v3.min.js"></script>
+    <script type="text/javascript" src="/static/echarts-all-3.js"></script>
+    <script src="/static/jquery.min.js"></script>
+    <link rel="stylesheet" href="/static/bootstrap.min.css">
+    <link href="https://fonts.font.im/css?family=Dancing+Script" rel="stylesheet">
+    <link href="https://fonts.font.im/css?family=Permanent+Marker" rel="stylesheet">
+    <style>
+        /* @font-face {
+            font-family: 'icomoon';
+            src: url('fonts/icomoon.eot?wr5es');
+            src: url('fonts/icomoon.eot?wr5es#iefix') format('embedded-opentype'),
+                url('fonts/icomoon.ttf?wr5es') format('truetype'),
+                url('fonts/icomoon.woff?wr5es') format('woff'),
+                url('fonts/icomoon.svg?wr5es#icomoon') format('svg');
+            font-weight: normal;
+            font-style: normal;
+            font-display: block;
+        } */
+
+        /* * {
+            font-family: 'Roboto';
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+
+
+        } */
+
+        #title {
+            margin: 0px auto;
+            width: 800px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        #widetext {
+            margin: 0px auto;
+            width: 1200px;
+            text-align: justify;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            font-family: 'Roboto', sans-serif;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card1 {
+            position: relative;
+            width: 250px;
+            height: 300px;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            left: 50px;
+
+        }
+
+        .card2 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            /* border-radius: 30px; */
+            transition: all 0.2s;
+            transform-style: preserve-3d;
+            box-shadow: inset 0 0 5px rgb(201, 141, 220);
+        }
+
+        .card2 img {
+            position: absolute;
+            top: 10px;
+            left: 50px;
+            width: 150px;
+            height: 150px;
+            /* border-radius: 50%; */
+            transform: translateZ(50px);
+            /* box-shadow: 0 0 10px rgb(83, 83, 83); */
+        }
+
+        .card2 h2 {
+            /* font-family: 'Roboto', cursive; */
+            position: absolute;
+            top: 170px;
+            width: 100%;
+            height: 28px;
+            font-size: 25px;
+            line-height: 28px;
+            text-align: center;
+            /* text-shadow: 0 0 5px rgb(177, 174, 174); */
+            color: rgb(33, 34, 34);
+            transform: translateZ(50px);
+        }
+
+        .card3 {
+            position: relative;
+            width: 250px;
+            height: 300px;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            right: 50px;
+
+        }
+
+        .card4 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            /* border-radius: 30px; */
+            transition: all 0.2s;
+            transform-style: preserve-3d;
+            box-shadow: inset 0 0 5px rgb(108, 162, 238);
+        }
+
+        .card4 img {
+            position: absolute;
+            top: 10px;
+            left: 50px;
+            width: 150px;
+            height: 150px;
+            /* border-radius: 50%; */
+            transform: translateZ(50px);
+            /* box-shadow: 0 0 10px rgb(83, 83, 83); */
+        }
+
+        .card4 h2 {
+            /* font-family: 'Roboto', cursive; */
+            position: absolute;
+            top: 170px;
+            width: 100%;
+            height: 28px;
+            font-size: 25px;
+            line-height: 28px;
+            text-align: center;
+            /* text-shadow: 0 0 5px rgb(177, 174, 174); */
+            color: rgb(33, 34, 34);
+            transform: translateZ(50px);
+        }
+
+        .txt {
+            /* font-family: 'Roboto', cursive; */
+            position: absolute;
+            top: 210px;
+            left: 25px;
+            width: 80%;
+            line-height: 20px;
+            font-size: 16px;
+            text-align: justify;
+            text-shadow: 0 0 10px rgb(185, 187, 186);
+            transform: translateZ(50px);
+        }
+
+        .font {
+            position: absolute;
+            top: 215px;
+            left: 50%;
+            width: 80%;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            transform: translateZ(50px) translateX(-50%);
+        }
+
+        .font span {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            font-size: 30px;
+            color: white;
+            border-radius: 50%;
+            background-color: rgb(61, 60, 60);
+            /*    border: 1px solid rgb(173, 172, 172) ; */
+            box-shadow: inset 0 0 8px white,
+                inset 0 0 8px white,
+                inset 0 0 8px white,
+                0 0 8px black;
+        }
+
+        #cardlist {
+            margin: 50px auto;
+            text-align: center;
+            display: flex;
+            width: 800px;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+    <script type="text/javascript" color="0,205,205" opacity='0.7' zIndex="-2" count="99"
+        src="//cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>
+
+
+    <div id="title">
+        <h3 class="display-8"><br><br>强生成式摘要实验系统</h3>
+        <hr class="my-3">
+        <div class="card text-white bg-primary mb-3" style="max-width: 1200px;" align="justify">
+            <div class="card-header">Introduction</div>
+            <div class="card-body">
+                <h4 class="card-title">实验系统入口</h4>
+                <p class="card-text">
+                    xxxxxxxx
+                </p>
+            </div>
+        </div>
+        <div id="cardlist">
+            <div class="card1" onclick="window.open('http://10.112.219.44:8002/show/')">
+                <div class="card2">
+                    <img src="/static/interact.png" alt="interact">
+                    <h2>交互界面</h2>
+                    <p class="txt">输入文章，模型在线推断生成摘要，并给出摘要结果的可视化分析。</p>
+                </div>
+            </div>
+            <script>
+                var card = document.querySelector('.card1');
+                var card2 = document.querySelector('.card2');
+                card.addEventListener('mousemove', function (e) {
+                    let x = e.clientX - card.offsetLeft;
+                    let left = card.offsetWidth / 2;
+                    let rotateY = -(left - x) / 5;
+                    let y = e.clientY - card.offsetTop;
+                    let top = card.offsetHeight / 2;
+                    let rotateX = (top - y) / 5;
+                    card2.style.cssText = `
+                   transform: rotateX(${rotateX}deg) rotateY(${rotateY}deg); `
+                })
+                card.addEventListener('mouseout', function (e) {
+                    card2.style.cssText = `
+                   transform: rotateY(0deg) rotateX(0deg); `
+                })
+            </script>
+
+            <div class="card3" onclick="window.open('http://10.112.219.44:8003/result/')">
+                <div class="card4">
+                    <img src="/static/analyze.png" alt="interact">
+                    <h2>分析界面</h2>
+                    <p class="txt">给定模型推断结果，计算每个样例的指标得分，并可视化演示OTR问题。</p>
+                </div>
+            </div>
+            <script>
+                var card3 = document.querySelector('.card3');
+                var card4 = document.querySelector('.card4');
+                card3.addEventListener('mousemove', function (e) {
+                    let x = e.clientX - card3.offsetLeft;
+                    let left = card3.offsetWidth / 2;
+                    let rotateY = -(left - x) / 5;
+                    let y = e.clientY - card3.offsetTop;
+                    let top = card3.offsetHeight / 2;
+                    let rotateX = (top - y) / 5;
+                    card4.style.cssText = `
+                               transform: rotateX(${rotateX}deg) rotateY(${rotateY}deg); `
+                })
+                card3.addEventListener('mouseout', function (e) {
+                    card4.style.cssText = `
+                               transform: rotateY(0deg) rotateX(0deg); `
+                })
+            </script>
+        </div>
+    </div>
+
+
+</body>
+
+</html>

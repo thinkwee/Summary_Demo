@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>阿维的摘要Demo</title>
+    {% load staticfiles %}
+    <link REL="SHORTCUT ICON" HREF="{% static "/favicon.ico" %}" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+    <script src="http://how2j.cn/study/js/chartjs/2.8.0/chart.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts-all-3.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <!-- <script src="/static/d3.parcoords.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/d3.parcoords.css"> -->
+
+    <style>
+        a.button1 {
+            display: inline-block;
+            padding: 0.35em 1.2em;
+            border: 0.1em solid #000000;
+            margin: 0 0.3em 0.3em 0;
+            border-radius: 0.12em;
+            box-sizing: border-box;
+            text-decoration: none;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 300;
+            color: #000000;
+            text-align: center;
+            font-size: 20px;
+            transition: all 0.2s;
+        }
+
+        a.button1:hover {
+            color: #FFFFFF;
+            background-color: #000000;
+            cursor: pointer;
+        }
+
+        @media all and (max-width:30em) {
+            a.button1 {
+                display: block;
+                margin: 0.4em auto;
+            }
+        }
+
+        /* Basic Grey */
+        .basic-grey {
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 1500px;
+            background: #F7F7F7;
+            padding: 25px 15px 25px 10px;
+            font: 20px 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+            color: rgb(68, 63, 63);
+            text-shadow: 1px 1px 1px #FFF;
+            border: 1px solid #E4E4E4;
+        }
+
+        .basic-grey h1 {
+            font-size: 20px;
+            padding: 0px 0px 10px 40px;
+            display: block;
+            border-bottom: 1px solid #E4E4E4;
+            margin: -10px -15px 30px -10px;
+            ;
+            color: #888;
+        }
+
+        .basic-grey h1>span {
+            display: block;
+            font-size: 15px;
+        }
+
+        .basic-grey label {
+            display: block;
+            margin: 0px;
+        }
+
+        .basic-grey label>span {
+            float: left;
+            width: 20%;
+            text-align: right;
+            padding-right: 10px;
+            margin-top: 10px;
+            color: #888;
+        }
+
+        .basic-grey input[type="text"],
+        .basic-grey input[type="email"],
+        .basic-grey textarea,
+        .basic-grey select {
+            border: 1px solid #DADADA;
+            color: rgb(59, 53, 53);
+            height: 30px;
+            margin-bottom: 16px;
+            margin-right: 6px;
+            margin-top: 2px;
+            outline: 0 none;
+            padding: 3px 3px 3px 5px;
+            width: 70%;
+            font-size: 15px;
+            line-height: 21px;
+            box-shadow: inset 0px 1px 4px #ECECEC;
+            -moz-box-shadow: inset 0px 1px 4px #ECECEC;
+            -webkit-box-shadow: inset 0px 1px 4px #ECECEC;
+        }
+
+        .basic-grey textarea {
+            padding: 5px 3px 3px 5px;
+        }
+
+        .basic-grey select {
+            background: #FFF url('down-arrow.png') no-repeat right;
+            background: #FFF url('down-arrow.png') no-repeat right;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            text-indent: 0.01px;
+            text-overflow: '';
+            width: 70%;
+            height: 35px;
+            line-height: 25px;
+        }
+
+        .basic-grey textarea {
+            height: 300px;
+        }
+
+        .basic-grey .button {
+            background: #E27575;
+            border: none;
+            padding: 10px 25px 10px 25px;
+            color: #FFF;
+            box-shadow: 1px 1px 5px #B6B6B6;
+            border-radius: 3px;
+            text-shadow: 1px 1px 1px #9E3F3F;
+            cursor: pointer;
+        }
+
+        .basic-grey .button:hover {
+            background: #CF7A7A
+        }
+    </style>
+    <script type="text/javascript">
+        //button 按钮，结合onclick事件，验证和提交表单
+        function checkForm() {
+            //判断用户名是否为空
+            if (document.form1.article.value == "") {
+                window.alert("文章不能为空");
+            } else {
+                //使用form对象的submit()方法，实现提交。
+                document.form1.submit();
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div align="center" class="basic-grey">
+        <form action="/show/" method="post" name="form1"> {% csrf_token %}
+            <h3><i class="fa fa-file-text"></i> 输入文章 <br>Input Article</h3>
+            <br>
+            <textarea name="article" rows="20" cols="120" placeholder="在此输入文章"></textarea>
+            <br>
+            <!-- <input type="submit" class="button1" value="抽他" /> -->
+            <!-- <input type="button" value="提交表单" onclick="checkForm()" /> -->
+            <a class="button1" onclick="checkForm()"><i class="fa fa-cog fa-spin fa-1.5x fa-fw"></i>生成摘要<i
+                    class="fa fa-cog fa-spin fa-1.5x fa-fw"></i></a>
+
+        </form>
+        <br>
+        <table>
+            <h3><i class="fa fa-files-o"></i> 处理后文章<br>Processed Article</h3>
+            <textarea rows="20" cols="120">{{article}}</textarea>
+
+            <h3><i class="fa fa-file-o"></i> 抽取式摘要<br>Extractive Summarization(TextRank)</h3>
+            <textarea rows="20" cols="120">{{extract_summary}}</textarea>
+
+            <h3><i class="fa fa-pencil-square-o"></i> 生成式摘要<br>Abstractive Summarization</h3>
+            <textarea rows="40"
+                cols="120">风格0 &#13;&#10;句子得分：{{sentence_score_0}} &#13;&#10;生成摘要： {{abstract_summary_0}} &#13;&#10;&#13;&#10;风格1 &#13;&#10;句子得分：{{sentence_score_1}} &#13;&#10;生成摘要： {{abstract_summary_1}}</textarea>
+            <br>
+            <a class="button1" id="show_log_prob"><i class="fa fa-cog fa-spin fa-1.5x fa-fw"></i>token概率显示<i
+                    class="fa fa-cog fa-spin fa-1.5x fa-fw"></i></a>
+            <br>
+            <div id="table_log_prob_0" style="width: 1200px;height:300px;"></div>
+            <br>
+            <div id="table_log_prob_1" style="width: 1200px;height:300px;"></div>
+
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChart_prob_0 = echarts.init(document.getElementById('table_log_prob_0'));
+                var y_0 = {{ y_point_0| safe}};
+                var x_0 = {{ x_point_0| safe}};
+                $("#table_log_prob_0").hide()
+                $("#table_log_prob_1").hide()
+
+            </script>
+
+
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChart_prob_1 = echarts.init(document.getElementById('table_log_prob_1'));
+                var y_1 = {{ y_point_1| safe}};
+                var x_1 = {{ x_point_1| safe}};
+            </script>
+
+            <script>
+                $(document).ready(function () {
+                    $("#show_log_prob").click(function () {
+                        // 填入数据
+                        $("#table_log_prob_0").slideToggle(500)
+
+                        myChart_prob_0.setOption({
+                            title: {
+                                text: '风格0 生成Token置信',
+                                subtext: 'Style 0 Predict Logprob'
+                            },
+                            tooltip: { show: true },
+                            dataZoom: [
+                                {
+                                    type: 'slider',
+                                    xAxisIndex: 0,
+                                    start: 0,
+                                    end: 100
+                                },
+                                {
+                                    type: 'inside',
+                                    xAxisIndex: 0,
+                                    start: 0,
+                                    end: 100
+                                },
+                            ],
+                            legend: {
+                                data: ['log prob']
+                            },
+                            yAxis: {},
+                            visualMap: {
+                                show: true,
+                                min: 0.0,
+                                max: 1.0,
+                                dimension: 1,
+                                inRange: {
+                                    color: ['#d94e5d', '#eac736', '#50a3ba'].reverse(),
+                                    // colorAlpha: [0, 1]
+                                }
+                            },
+                            xAxis: {
+                                data: x_0,
+                                axisLabel: {
+                                    interval: 0,
+                                    rotate: 40
+                                },
+                                show: false
+                            },
+                            series: [{
+                                name: 'log prob',
+                                type: 'line',
+                                smooth: true,
+                                data: y_0,
+                                itemStyle: { normal: { label: { formatter: '{b}', show: true, textStyle: { fontWeight: 'bolder' } } } },
+                                areaStyle: {
+                                    normal: {
+                                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                            offset: 0,
+                                            color: '#d94e5d'
+                                        }, {
+                                            offset: 0.5,
+                                            color: '#eac736'
+                                        }, {
+                                            offset: 1,
+                                            color: '#50a3ba'
+                                        }]),
+                                        opacity: 0.2
+                                    }
+                                },
+                            }],
+                            animationDuration: 3000,
+                        });
+
+                        $("#table_log_prob_1").slideToggle(500)
+
+                        myChart_prob_1.setOption({
+                            title: {
+                                text: '风格1 生成Token置信',
+                                subtext: 'Style 1 Predict Logprob'
+                            },
+                            tooltip: { show: true },
+                            dataZoom: [
+                                {
+                                    type: 'slider',
+                                    xAxisIndex: 0,
+                                    start: 0,
+                                    end: 100
+                                },
+                                {
+                                    type: 'inside',
+                                    xAxisIndex: 0,
+                                    start: 0,
+                                    end: 100
+                                },
+                            ],
+                            legend: {
+                                data: ['log prob']
+                            },
+                            yAxis: { type: "value" },
+                            visualMap: {
+                                show: true,
+                                min: 0.0,
+                                max: 1.0,
+                                dimension: 1,
+                                inRange: {
+                                    color: ['#d94e5d', '#eac736', '#50a3ba'].reverse(),
+                                    // colorAlpha: [0, 1]
+                                }
+                            },
+                            xAxis: {
+                                data: x_1,
+                                axisLabel: {
+                                    interval: 0,
+                                    rotate: 40
+                                },
+                                show: false,
+                                boundaryGap: false,
+                                type: 'category',
+                            },
+                            series: [{
+                                name: 'log prob',
+                                type: 'line',
+                                smooth: true,
+                                data: y_1,
+                                itemStyle: { normal: { label: { formatter: '{b}', show: true, textStyle: { fontWeight: 'bolder' } } } },
+                                areaStyle: {
+                                    normal: {
+                                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                            offset: 0,
+                                            color: '#d94e5d'
+                                        }, {
+                                            offset: 0.5,
+                                            color: '#eac736'
+                                        }, {
+                                            offset: 1,
+                                            color: '#50a3ba'
+                                        }]),
+                                        opacity: 0.2
+                                    }
+                                },
+                            }],
+                            animationDuration: 3000,
+                        });
+                    });
+                });
+            </script>
+
+            <h3><i class="fa fa-bar-chart"></i> 注意力对齐<br>Attention Alignments</h3>
+            <textarea rows="20"
+                cols="120">风格0 &#13;&#10;注意力对齐：{{align_0}} &#13;&#10;&#13;&#10;风格1 &#13;&#10;注意力对齐：{{align_1}} &#13;&#10;</textarea>
+            <br>
+            <a class="button1" id="show_attention"><i class="fa fa-cog fa-spin fa-1.5x fa-fw"></i>显示attention<i
+                    class="fa fa-cog fa-spin fa-1.5x fa-fw"></i></a>
+            <br>
+            <div id="attention_tables" style="width: 1100px; height: 500px;">
+                <div id="table_attention_0" style="width: 500px; height:500px; float:left;"></div>
+                <div id="table_attention_1" style="width: 500px; height:500px; float:left;margin-left:100px;">
+                </div>
+            </div>
+
+
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChart_attn_0 = echarts.init(document.getElementById('table_attention_0'));
+                var alignments_0 = {{ alignments_0| safe}};
+                var lineStyle = {
+                    normal: {
+                        width: 2,
+                        opacity: 0.5
+                    }
+                };
+                var myChart_attn_1 = echarts.init(document.getElementById('table_attention_1'));
+                var alignments_1 = {{ alignments_1| safe}};
+                var lineStyle = {
+                    normal: {
+                        width: 2,
+                        opacity: 0.5
+                    }
+                };
+                $("#attention_tables").hide()
+                $("#table_attention_0").hide()
+                $("#table_attention_1").hide()
+
+
+            </script>
+
+            <script>
+                $(document).ready(function () {
+                    $("#show_attention").click(function () {
+                        $("#attention_tables").slideToggle(500)
+                        $("#table_attention_0").slideToggle(500)
+
+                        // 指定图表的配置项和数据
+                        myChart_attn_0.setOption({
+                            title: {
+                                text: '风格0 注意力对齐\nStyle 0 Attention Alignments',
+                                subtext: '',
+                                textStyle: { fontSize: 20 },
+                                x: 'center',
+                                y: 'bottom'
+                            },
+                            tooltip: {},
+                            parallelAxis: [
+                                { dim: 0, name: 'Predict Probility' },
+                                { dim: 1, name: 'Summary Tokens' },
+                                { dim: 2, name: 'Article Tokens' },
+                            ],
+                            visualMap: {
+                                show: true,
+                                min: 0.0,
+                                max: 1.0,
+                                dimension: 0,
+                                inRange: {
+                                    color: ['#d94e5d', '#eac736', '#50a3ba'].reverse(),
+                                    // colorAlpha: [0, 1]
+                                }
+                            },
+                            series: {
+                                type: 'parallel',
+                                lineStyle: {
+                                    width: 4
+                                },
+                                data: alignments_0,
+                                lineStyle: lineStyle,
+                            },
+                            legend: {
+                                data: ['attention alignments']
+                            },
+                            animationDuration: 1000,
+                        });
+
+                        $("#table_attention_1").slideToggle(500)
+
+                        myChart_attn_1.setOption({
+                            title: {
+                                text: '风格1 注意力对齐\nStyle 1 Attention Alignments',
+                                subtext: '',
+                                textStyle: { fontSize: 20 },
+                                x: 'center',
+                                y: 'bottom'
+                            },
+                            tooltip: {},
+                            parallelAxis: [
+                                { dim: 0, name: 'Predict Probility' },
+                                { dim: 1, name: 'Summary Tokens' },
+                                { dim: 2, name: 'Article Tokens' },
+                            ],
+                            visualMap: {
+                                show: true,
+                                min: 0.0,
+                                max: 1.0,
+                                dimension: 0,
+                                inRange: {
+                                    color: ['#d94e5d', '#eac736', '#50a3ba'].reverse(),
+                                    // colorAlpha: [0, 1]
+                                }
+                            },
+                            series: {
+                                type: 'parallel',
+                                lineStyle: {
+                                    width: 4
+                                },
+                                data: alignments_1,
+                                lineStyle: lineStyle,
+                            },
+                            legend: {
+                                data: ['attention alignments']
+                            },
+                            animationDuration: 1000,
+                        });
+                    });
+                });
+            </script>
+
+
+            <h3><i class="fa fa-bar-chart"></i> 文章相关指标<br>Article Related Metrics</h3>
+            <textarea rows="20"
+                cols="120">风格0 &#13;&#10;指标：{{metrics_0}} &#13;&#10;&#13;&#10;风格1 &#13;&#10;指标：{{metrics_1}} &#13;&#10;</textarea>
+
+            <br>
+            <a class="button1" id="show_metric"><i class="fa fa-cog fa-spin fa-1.5x fa-fw"></i>显示文章相关指标<i
+                    class="fa fa-cog fa-spin fa-1.5x fa-fw"></i></a>
+            <br>
+            <div id="metrics" style="width: 600px;height:600px;"></div>
+
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChart_metric = echarts.init(document.getElementById('metrics'));
+                var metrics_0 = {{ metrics_0| safe}};
+                var metrics_1 = {{ metrics_1| safe}};
+                $("#metrics").hide()
+            </script>
+            <script>
+                $(document).ready(function () {
+                    $("#show_metric").click(function () {
+
+                        // 指定图表的配置项和数据
+                        $("#metrics").fadeToggle(500)
+
+                        myChart_metric.setOption({
+                            title: {},
+                            tooltip: {},
+                            legend: {
+                                data: ['风格0', '风格1']
+                            },
+                            radar: {
+                                shape: 'circle',
+                                splitNumber: 4,
+                                name: {
+                                    formatter: '【{value}】',
+                                    textStyle: {
+                                        color: '#fff',
+                                        backgroundColor: '#999',
+                                        borderRadius: 3,
+                                        fontSize: 10,
+                                        padding: [3, 3],
+                                    }
+                                },
+                                axisLine: {
+                                    lineStyle: {
+                                        color: 'rgba(255, 255, 255, 0.5)'
+                                    }
+                                },
+                                splitLine: {
+                                    lineStyle: {
+                                        color: 'rgba(255, 255, 255, 0.5)'
+                                    }
+                                },
+                                indicator: [
+                                    { name: 'N1', max: 0.5 },
+                                    { name: 'N2', max: 1.0 },
+                                    { name: 'JSDIS', max: 1.0 },
+                                    { name: 'JSDIS_MAX', max: 1.0 },
+                                    { name: 'JSDIS_MIN', max: 1.0 },
+                                ]
+                            },
+                            series: [{
+                                name: '指标对比',
+                                type: 'radar',
+                                data: [
+                                    {
+                                        value: metrics_0,
+                                        name: '风格0',
+                                    },
+                                    {
+                                        value: metrics_1,
+                                        name: '风格1',
+                                    },
+                                ]
+                            }],
+                            animationDuration: 6000,
+                        });
+                    });
+                });
+            </script>
+        </table>
+    </div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>实验系统交互界面</title>
+    {% load staticfiles %}
+    <link REL="SHORTCUT ICON" HREF="{% static "/favicon.ico" %}" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+    <!-- <link rel="stylesheet" href="/static/font-awesome.css"> -->
+    <script src="/static/chart.min.js"></script>
+    <script src="/static/d3.v3.min.js"></script>
+    <script type="text/javascript" src="/static/echarts-all-3.js"></script>
+    <script src="/static/jquery.min.js"></script>
+    <link rel="stylesheet" href="/static/bootstrap.min.css">
+
+    <style>
+        a.button1 {
+            display: inline-block;
+            padding: 0.35em 1.2em;
+            border: 0.1em solid #000000;
+            margin: 0 0.3em 0.3em 0;
+            border-radius: 0.12em;
+            box-sizing: border-box;
+            text-decoration: none;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 300;
+            color: #000000;
+            text-align: center;
+            font-size: 20px;
+            transition: all 0.2s;
+        }
+
+        a.button1:hover {
+            color: #FFFFFF;
+            background-color: #000000;
+            cursor: pointer;
+        }
+
+        @media all and (max-width:30em) {
+            a.button1 {
+                display: block;
+                margin: 0.4em auto;
+            }
+        }
+    </style>
+    <script type="text/javascript">
+        //button 按钮，结合onclick事件，验证和提交表单
+        function checkForm() {
+            //判断用户名是否为空
+            if (document.form1.article.value == "") {
+                window.alert("文章不能为空");
+            } else {
+                //使用form对象的submit()方法，实现提交。
+                document.form1.submit();
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+    <script type="text/javascript" color="0,205,205" opacity='0.7' zIndex="-2" count="99"
+        src="//cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>
+    <div align="center">
+        <div>
+            <h3 class="display-8"><br><br>强生成式摘要实验系统</h3>
+            <hr class="my-4">
+            <div class="card text-white bg-primary mb-3" style="max-width: 800px;" align="left">
+                <div class="card-header">Introduction</div>
+                <div class="card-body">
+                    <h4 class="card-title">摘要模型交互界面</h4>
+                    <h6 class="card-subtitle text-muted">Summary Model Interaction Module</h6>
+                    <p class="card-text">
+                        在线交互式生成摘要，对比两个模型的结果、Token预测概率、注意力对齐以及文章相关指标。这里展示了主观偏差实验中切分数据后训练的两个主观风格模型，在CNN-DailyMail新闻语料上训练。
+                    </p>
+                </div>
+            </div>
+            <br>
+            <div class="card text-white bg-primary mb-3" style="max-width: 1000px; max-height:400px" align="left">
+                <div class="card-header"><i class="fa fa-file-text"></i> 输入文章<br>Input Article</div>
+                <form action="/show/" method="post" name="form1"> {% csrf_token %}
+                    <textarea name="article" rows="20" cols="100" placeholder="在此输入文章" class="form-control"
+                        style="max-width: 1000px; max-height:300px"></textarea>
+                </form>
+            </div>
+            <a class="button1" onclick="checkForm()"><i class="fa fa-cog fa-spin fa-1.5x fa-fw"></i>生成摘要<i
+                    class="fa fa-cog fa-spin fa-1.5x fa-fw"></i></a>
+        </div>
+        <br>
+        <div class="card text-white bg-primary mb-3" style="max-width: 1000px; max-height:400px" align="left">
+            <div class="card-header"><i class="fa fa-file-text-o"></i> 处理后文章<br>Processed Article</div>
+            <textarea class="form-control" rows="20" cols="120"
+                style="max-width: 1000px; max-height:300px">{{article}}</textarea>
+        </div>
+        <br>
+        <div class="card bg-light mb-3" style="max-width: 1000px; max-height:400px" align="left">
+            <div class="card-header bg-primary text-white"><i class="fa fa-file-o"></i> 抽取式摘要<br>Extractive
+                Summarization(TextRank)</div>
+            <table class="table table-light" style="max-width: 1000px;  max-height:400px">
+                <thead>
+                    <tr>
+                        <th scope="col" width="10%">序号</th>
+                        <th scope="col">抽取摘要</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-light">
+                        <th scope="row" width="10%">1</th>
+                        <td id="td0"></td>
+                    </tr>
+                    <tr class="table-light">
+                        <th scope="row" width="10%">2</th>
+                        <td id="td1"></td>
+                    </tr>
+                    <tr class="table-light">
+                        <th scope="row" width="10%">3</th>
+                        <td id="td2"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <script>
+                var extract_summary = {{ extract_summary| safe}};
+                document.getElementById("td0").innerHTML = extract_summary[0];
+                document.getElementById("td1").innerHTML = extract_summary[1];
+                document.getElementById("td2").innerHTML = extract_summary[2];
+            </script>
+        </div>
+        <br>
+        <div class="card bg-light mb-3" style="max-width: 1000px; max-height:400px" align="left">
+            <div class="card-header bg-primary text-white"><i class="fa fa-pencil-square-o"></i> 生成式摘要<br>Abstractive
+                Summarization</div>
+            <table class="table table-light" style="max-width: 1000px;">
+                <thead>
+                    <tr>
+                        <th scope="col" width="10%">风格</th>
+                        <th scope="col">句子得分</th>
+                        <th scope="col">生成摘要</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-light">
+                        <th scope="row" width="10%">风格 0</th>
+                        <td id="tda0">{{sentence_score_0}}</td>
+                        <td id="tda0">{{abstract_summary_0}}</td>
+                    </tr>
+                    <tr class="table-light">
+                        <th scope="row" width="10%">风格 1</th>
+                        <td id="tda1">{{sentence_score_1}}</td>
+                        <td id="tda1">{{abstract_summary_1}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <div class="card bg-light mb-3" style="max-width: 1000px; max-height:800px" align="left">
+            <div class="card-header text-white bg-primary"><i class="fa fa-bar-chart"></i> Token预测概率可视化<br>Token Predict
+                Prob</div>
+            <div id="table_log_prob_0" style="width: 1000px;height:300px;"></div>
+            <div id="table_log_prob_1" style="width: 1000px;height:300px;"></div>
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChart_prob_0 = echarts.init(document.getElementById('table_log_prob_0'));
+                var y_0 = {{ y_point_0| safe}};
+                var x_0 = {{ x_point_0| safe}};
+                $("#table_log_prob_0").hide()
+                $("#table_log_prob_1").hide()
+            </script>
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChart_prob_1 = echarts.init(document.getElementById('table_log_prob_1'));
+                var y_1 = {{ y_point_1| safe}};
+                var x_1 = {{ x_point_1| safe}};
+            </script>
+            <script>
+                $(document).ready(function () {
+                    $("#show_log_prob").click(function () {
+                        // 填入数据
+                        $("#table_log_prob_0").slideToggle(500)
+
+                        myChart_prob_0.setOption({
+                            title: {
+                                text: '风格0 生成Token置信',
+                                subtext: 'Style 0 Predict Logprob',
+                                textStyle: {
+                                    fontSize: 14,
+                                },
+                                subtextStyle: {
+                                    fontSize: 10,
+                                },
+                            },
+                            tooltip: { show: true },
+                            dataZoom: [
+                                {
+                                    type: 'slider',
+                                    xAxisIndex: 0,
+                                    start: 0,
+                                    end: 100
+                                },
+                                {
+                                    type: 'inside',
+                                    xAxisIndex: 0,
+                                    start: 0,
+                                    end: 100
+                                },
+                            ],
+                            legend: {
+                                data: ['log prob']
+                            },
+                            yAxis: {},
+                            visualMap: {
+                                show: true,
+                                min: 0.0,
+                                max: 1.0,
+                                dimension: 1,
+                                inRange: {
+                                    color: ['#d94e5d', '#eac736', '#50a3ba'].reverse(),
+                                    // colorAlpha: [0, 1]
+                                }
+                            },
+                            xAxis: {
+                                data: x_0,
+                                axisLabel: {
+                                    interval: 0,
+                                    rotate: 40
+                                },
+                                show: false
+                            },
+                            series: [{
+                                name: 'log prob',
+                                type: 'line',
+                                smooth: true,
+                                data: y_0,
+                                itemStyle: { normal: { label: { formatter: '{b}', show: true, textStyle: { fontWeight: 'bolder' } } } },
+                                areaStyle: {
+                                    normal: {
+                                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                            offset: 0,
+                                            color: '#d94e5d'
+                                        }, {
+                                            offset: 0.5,
+                                            color: '#eac736'
+                                        }, {
+                                            offset: 1,
+                                            color: '#50a3ba'
+                                        }]),
+                                        opacity: 0.2
+                                    }
+                                },
+                            }],
+                            animationDuration: 3000,
+                        });
+
+                        $("#table_log_prob_1").slideToggle(500)
+
+                        myChart_prob_1.setOption({
+                            title: {
+                                text: '风格1 生成Token置信',
+                                subtext: 'Style 1 Predict Logprob',
+                                textStyle: {
+                                    fontSize: 14,
+                                },
+                                subtextStyle: {
+                                    fontSize: 10,
+                                },
+                            },
+                            tooltip: { show: true },
+                            dataZoom: [
+                                {
+                                    type: 'slider',
+                                    xAxisIndex: 0,
+                                    start: 0,
+                                    end: 100
+                                },
+                                {
+                                    type: 'inside',
+                                    xAxisIndex: 0,
+                                    start: 0,
+                                    end: 100
+                                },
+                            ],
+                            legend: {
+                                data: ['log prob']
+                            },
+                            yAxis: { type: "value" },
+                            visualMap: {
+                                show: true,
+                                min: 0.0,
+                                max: 1.0,
+                                dimension: 1,
+                                inRange: {
+                                    color: ['#d94e5d', '#eac736', '#50a3ba'].reverse(),
+                                    // colorAlpha: [0, 1]
+                                }
+                            },
+                            xAxis: {
+                                data: x_1,
+                                axisLabel: {
+                                    interval: 0,
+                                    rotate: 40
+                                },
+                                show: false,
+                                boundaryGap: false,
+                                type: 'category',
+                            },
+                            series: [{
+                                name: 'log prob',
+                                type: 'line',
+                                smooth: true,
+                                data: y_1,
+                                itemStyle: { normal: { label: { formatter: '{b}', show: true, textStyle: { fontWeight: 'bolder' } } } },
+                                areaStyle: {
+                                    normal: {
+                                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                            offset: 0,
+                                            color: '#d94e5d'
+                                        }, {
+                                            offset: 0.5,
+                                            color: '#eac736'
+                                        }, {
+                                            offset: 1,
+                                            color: '#50a3ba'
+                                        }]),
+                                        opacity: 0.2
+                                    }
+                                },
+                            }],
+                            animationDuration: 3000,
+                        });
+                    });
+                });
+            </script>
+        </div>
+        <a class="button1" id="show_log_prob"><i class="fa fa-cog fa-spin fa-1.5x fa-fw"></i>显示token概率<i
+                class="fa fa-cog fa-spin fa-1.5x fa-fw"></i></a>
+        <br>
+        <br>
+        <br>
+        <div class="card bg-light mb-3" style="max-width: 1000px; max-height:800px" align="left">
+            <div class="card-header text-white bg-primary"><i class="fa fa-bar-chart"></i> 注意力对齐<br>Attention Alignments
+            </div>
+            <div id="attention_tables" style="width: 1000px; height: 500px;  ">
+                <div id="table_attention_0" style="width: 480px; height:500px; float:left;"></div>
+                <div id="table_attention_1" style="width: 480px; height:500px; float:left;margin-left:40px;">
+                </div>
+            </div>
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChart_attn_0 = echarts.init(document.getElementById('table_attention_0'));
+                var alignments_0 = {{ alignments_0| safe}};
+                var lineStyle = {
+                    normal: {
+                        width: 2,
+                        opacity: 0.5
+                    }
+                };
+                var myChart_attn_1 = echarts.init(document.getElementById('table_attention_1'));
+                var alignments_1 = {{ alignments_1| safe}};
+                var lineStyle = {
+                    normal: {
+                        width: 2,
+                        opacity: 0.5
+                    }
+                };
+                $("#attention_tables").hide()
+                $("#table_attention_0").hide()
+                $("#table_attention_1").hide()
+
+
+            </script>
+            <script>
+                $(document).ready(function () {
+                    $("#show_attention").click(function () {
+                        $("#attention_tables").slideToggle(500)
+                        $("#table_attention_0").slideToggle(500)
+
+                        // 指定图表的配置项和数据
+                        myChart_attn_0.setOption({
+                            title: {
+                                text: '风格0 注意力对齐\nStyle 0 Attention Alignments',
+                                textStyle: {
+                                    fontSize: 14,
+                                },
+                                x: 'center',
+                                y: 'bottom'
+                            },
+                            tooltip: {},
+                            parallelAxis: [
+                                { dim: 0, name: 'Predict Probility' },
+                                { dim: 1, name: 'Summary Tokens' },
+                                { dim: 2, name: 'Article Tokens' },
+                            ],
+                            visualMap: {
+                                show: true,
+                                min: 0.0,
+                                max: 1.0,
+                                dimension: 0,
+                                inRange: {
+                                    color: ['#d94e5d', '#eac736', '#50a3ba'].reverse(),
+                                    // colorAlpha: [0, 1]
+                                }
+                            },
+                            series: {
+                                type: 'parallel',
+                                lineStyle: {
+                                    width: 4
+                                },
+                                data: alignments_0,
+                                lineStyle: lineStyle,
+                            },
+                            legend: {
+                                data: ['attention alignments']
+                            },
+                            animationDuration: 1000,
+                        });
+
+                        $("#table_attention_1").slideToggle(500)
+
+                        myChart_attn_1.setOption({
+                            title: {
+                                text: '风格1 注意力对齐\nStyle 1 Attention Alignments',
+                                textStyle: {
+                                    fontSize: 14,
+                                },
+                                x: 'center',
+                                y: 'bottom'
+                            },
+                            tooltip: {},
+                            parallelAxis: [
+                                { dim: 0, name: 'Predict Probility' },
+                                { dim: 1, name: 'Summary Tokens' },
+                                { dim: 2, name: 'Article Tokens' },
+                            ],
+                            visualMap: {
+                                show: true,
+                                min: 0.0,
+                                max: 1.0,
+                                dimension: 0,
+                                inRange: {
+                                    color: ['#d94e5d', '#eac736', '#50a3ba'].reverse(),
+                                    // colorAlpha: [0, 1]
+                                }
+                            },
+                            series: {
+                                type: 'parallel',
+                                lineStyle: {
+                                    width: 4
+                                },
+                                data: alignments_1,
+                                lineStyle: lineStyle,
+                            },
+                            legend: {
+                                data: ['attention alignments']
+                            },
+                            animationDuration: 1000,
+                        });
+                    });
+                });
+            </script>
+        </div>
+        <a class="button1" id="show_attention"><i class="fa fa-cog fa-spin fa-1.5x fa-fw"></i>显示attention<i
+                class="fa fa-cog fa-spin fa-1.5x fa-fw"></i></a>
+        <br>
+        <br>
+        <br>
+        <div class="card bg-light mb-3" style="max-width: 1000px; max-height:800px" align="left">
+            <div class="card-header text-white bg-primary"><i class="fa fa-bar-chart"></i> 文章相关指标<br>Article Related
+                Metrics
+            </div>
+            <div id="metrics" style="width: 1000px;height:600px; "></div>
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChart_metric = echarts.init(document.getElementById('metrics'));
+                var metrics_0 = {{ metrics_0| safe}};
+                var metrics_1 = {{ metrics_1| safe}};
+                $("#metrics").hide()
+            </script>
+            <script>
+                $(document).ready(function () {
+                    $("#show_metric").click(function () {
+
+                        // 指定图表的配置项和数据
+                        $("#metrics").fadeToggle(500)
+
+                        myChart_metric.setOption({
+                            title: {},
+                            tooltip: {},
+                            legend: {
+                                data: ['风格0', '风格1']
+                            },
+                            radar: {
+                                shape: 'circle',
+                                splitNumber: 4,
+                                name: {
+                                    formatter: '【{value}】',
+                                    textStyle: {
+                                        color: '#fff',
+                                        backgroundColor: '#999',
+                                        borderRadius: 3,
+                                        fontSize: 10,
+                                        padding: [3, 3],
+                                    }
+                                },
+                                axisLine: {
+                                    lineStyle: {
+                                        color: 'rgba(255, 255, 255, 0.5)'
+                                    }
+                                },
+                                splitLine: {
+                                    lineStyle: {
+                                        color: 'rgba(255, 255, 255, 0.5)'
+                                    }
+                                },
+                                indicator: [
+                                    { name: 'N1', max: 0.5 },
+                                    { name: 'N2', max: 1.0 },
+                                    { name: 'JSDIS', max: 1.0 },
+                                    { name: 'JSDIS_MAX', max: 1.0 },
+                                    { name: 'JSDIS_MIN', max: 1.0 },
+                                ]
+                            },
+                            series: [{
+                                name: '指标对比',
+                                type: 'radar',
+                                data: [
+                                    {
+                                        value: metrics_0,
+                                        name: '风格0',
+                                    },
+                                    {
+                                        value: metrics_1,
+                                        name: '风格1',
+                                    },
+                                ]
+                            }],
+                            animationDuration: 6000,
+                        });
+                    });
+                });
+            </script>
+        </div>
+        <h3></h3>
+        <a class="button1" id="show_metric"><i class="fa fa-cog fa-spin fa-1.5x fa-fw"></i>显示文章相关指标<i
+                class="fa fa-cog fa-spin fa-1.5x fa-fw"></i></a>
+
+</body>
+
+</html>
